@@ -15,10 +15,10 @@ main = do
       let new_term = to_term term
       putStrLn("input term: " ++ tostring new_term)
       recur_eval new_term
-      let ((p, tp), _) = ppc new_term recorder 
+      --let ((p, tp), _) = ppc new_term recorder 
       --let (sub, pre) = eval_type new_term context
-      putStrLn("Created context: " ++ context_to_string p)
-      putStrLn("Assigned type: " ++ pretostring tp)
+      --putStrLn("Created context: " ++ context_to_string p)
+      --putStrLn("Assigned type: " ++ pretostring tp)
 
 
 xgc = do
@@ -228,9 +228,6 @@ occur _ (TVar []) = False
 
 
 
-
-
-
 recur_eval :: Term -> IO()
 recur_eval t | evalnormal t == t = putStrLn("")
              | otherwise = do
@@ -355,9 +352,10 @@ evalcbn (App x y) | x == evalcbn x = (App x y)
 evalcbv :: Term -> Term
 evalcbv (Var x) = Var x
 evalcbv (Abs x t) = (Abs x t)
-evalcbv (App (Abs x t) y) = subs t (Var x, y)
-evalcbv (App x y) | x == evalcbn x = (App x (evalcbv y))
-                  | otherwise = (App (evalcbn x) y) 
+evalcbv (App (Abs x t) y) | y == evalcbv y = subs t (Var x, y)
+                          | otherwise = App (Abs x t) (evalcbv y)
+evalcbv (App x y) | x == evalcbv x = (App x (evalcbv y))
+                  | otherwise = (App (evalcbv x) y) 
 
 
 --head reduction
@@ -366,8 +364,8 @@ headreduction :: Term -> Term
 headreduction (Var x) = Var x
 headreduction (Abs x t) = (Abs x (headreduction t))
 headreduction (App (Abs x t) y) = subs t (Var x, y)
-headreduction (App x y) | x == evalcbn x = (App x y)
-                  | otherwise = (App (evalcbn x) y) 
+headreduction (App x y) | x == headreduction x = (App x y)
+                  | otherwise = (App (headreduction x) y) 
 
 
 --call-by-value reduction
@@ -375,7 +373,9 @@ headreduction (App x y) | x == evalcbn x = (App x y)
 apporder :: Term -> Term
 apporder (Var x) = Var x
 apporder (Abs x t) = (Abs x (apporder t))
-apporder (App (Abs x t) y) = subs t (Var x, apporder y)
+apporder (App (Abs x t) y) | apporder (Abs x t) /= (Abs x t)  = (App (apporder (Abs x t)) y)
+                           | apporder (Abs x t) == (Abs x t) && apporder y /= y = (App (Abs x t) (apporder y))
+                           | apporder (Abs x t) == (Abs x t) && apporder y == y = subs t (Var x, y)
 apporder (App x y) | x == apporder x = (App x (apporder y))
                   | otherwise = (App (apporder x) y) 
                   
@@ -426,7 +426,7 @@ subs (Abs y m) (Var x, n) | not ((Var y) `elem` (freevar n)) &&  y /= x =  Abs y
                           | (Var y) `elem` (freevar n) && y/= x = Abs 'z' (subs (subs m (Var y, Var 'z')) (Var x, n) )       
 
 
-subs (App p q) (Var y, n) = evalnormal (App (subs p (Var y, n)) (subs q (Var y, n)))
+subs (App p q) (Var y, n) = App (subs p (Var y, n)) (subs q (Var y, n))
 
 
 --print a term
