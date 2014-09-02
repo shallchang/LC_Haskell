@@ -90,6 +90,11 @@ context_to_string (x:xs) | xs == [] =  stat_to_string x
 context_to_string [] = []
 
  
+ 
+mergeSts :: Context -> Context
+mergeSts ((a, b):xs) = xs
+ 
+
 {-|
   Type assignment mechanism
 -}
@@ -229,8 +234,11 @@ occur _ (TVar []) = False
 recur_eval :: Term -> IO()
 recur_eval t | evalnormal t == t = putStrLn("")
              | otherwise = do
-                         putStrLn("==> "++ tostring (evalnormal t))
-                         recur_eval (evalnormal t)
+                         let recorder = ['A'..'Z']
+                         let ((p, tp), _) = ppc term recorder
+                         putStrLn("==> "++ tostring term++ "      " ++  context_to_string p ++ " |- "++ tostring term ++ ":" ++ pretostring tp)
+                         recur_eval term
+                           where term = evalnormal t
 
 
 recur_evalxgc :: Term -> IO()
