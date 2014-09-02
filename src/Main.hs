@@ -25,15 +25,17 @@ main = do
 xgc = do
       putStrLn "Please input a term"
       term <- getLine
-      --let recorder = ['A'..'Z']
+      let recorder = ['A'..'Z']
      
       let new_term = to_term term
-      putStrLn("input term: " ++ tostring new_term)
+      
+
+      putStrLn("-------------------------------------------------")
+      let ((p, tp), _) = ppc new_term recorder 
+      --let (sub, pre) = eval_type new_term context
+      putStrLn(tostring new_term ++ "      " ++  context_to_string p ++ " |- "++ tostring new_term ++ ":" ++ pretostring tp)
+      
       recur_evalxgc new_term
-      --let ((p, tp), _) = ppc new_term recorder 
-      --putStrLn("Reduction result: " ++ tostring result)
-      --putStrLn("Created context: " ++ context_to_string p)
-      --putStrLn("Assigned type: " ++ pretostring tp)
     
 
 
@@ -90,9 +92,6 @@ context_to_string (x:xs) | xs == [] =  stat_to_string x
 context_to_string [] = []
 
  
- 
-mergeSts :: Context -> Context
-mergeSts ((a, b):xs) = xs
  
 
 {-|
@@ -213,9 +212,6 @@ ppc (App m n) r = ((context_sub s2 (context_sub s1 (pi1++pi2)), type_subs s2 (ty
                         s2 = unify_contexts (context_sub s1 pi1) (context_sub s1 pi2)
 
 
-
-
-
 --get a fresh type from the recorder
 
 fresh :: [Char] -> (Type, [Char])
@@ -244,8 +240,9 @@ recur_eval t | evalnormal t == t = putStrLn("")
 recur_evalxgc :: Term -> IO()
 recur_evalxgc t | evalxgc t == t = putStrLn("")
                 | otherwise = do
-                         putStrLn("==> "++ tostring (evalxgc t))
-                         recur_evalxgc (evalxgc t)
+                         putStrLn("==> "++ tostring term)
+                         recur_evalxgc term
+                           where term = evalxgc t
 
 
 to_term ::[Char] -> Term
@@ -440,7 +437,7 @@ subs (App p q) (Var y, n) = App (subs p (Var y, n)) (subs q (Var y, n))
 tostring :: Term -> String
 tostring (Var x) = [x]
 tostring (Abs x y) = "(/" ++ [x] ++ "." ++ (tostring y) ++ ")"
-tostring (App x y) = "" ++ tostring x ++ tostring y
+tostring (App x y) = "(" ++ tostring x ++ tostring y ++ ")"
 tostring (XSub m from to) = tostring m ++ "<" ++ tostring from ++ " := " ++ tostring to ++ ">"
 
 
