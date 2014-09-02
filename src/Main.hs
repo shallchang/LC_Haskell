@@ -226,8 +226,6 @@ occur (TVar [x]) (TVar (a:ax)) | x == a = True
 occur _ (TVar []) = False
 
 
-
-
 recur_eval :: Term -> IO()
 recur_eval t | evalnormal t == t = putStrLn("")
              | otherwise = do
