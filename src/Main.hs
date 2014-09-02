@@ -13,13 +13,14 @@ main = do
       let recorder = ['A'..'Z']
       
       let new_term = to_term term
-      putStrLn("input term: " ++ tostring new_term)
-      recur_eval new_term
-      --let ((p, tp), _) = ppc new_term recorder 
+      
+      putStrLn("-------------------------------------------------")
+      let ((p, tp), _) = ppc new_term recorder 
       --let (sub, pre) = eval_type new_term context
-      --putStrLn("Created context: " ++ context_to_string p)
-      --putStrLn("Assigned type: " ++ pretostring tp)
-
+      putStrLn(tostring new_term ++ "      " ++  context_to_string p ++ " |- "++ tostring new_term ++ ":" ++ pretostring tp)
+      
+      recur_eval new_term
+      
 
 xgc = do
       putStrLn "Please input a term"
@@ -30,7 +31,6 @@ xgc = do
       putStrLn("input term: " ++ tostring new_term)
       recur_evalxgc new_term
       --let ((p, tp), _) = ppc new_term recorder 
-      --let (sub, pre) = eval_type new_term context
       --putStrLn("Reduction result: " ++ tostring result)
       --putStrLn("Created context: " ++ context_to_string p)
       --putStrLn("Assigned type: " ++ pretostring tp)
@@ -86,7 +86,7 @@ stat_to_string (x, y) = (tostring x) ++ ":" ++ (pretostring y)
 --context to string
 context_to_string :: Context -> String
 context_to_string (x:xs) | xs == [] =  stat_to_string x
-                         | otherwise = stat_to_string x ++ " " ++ context_to_string xs
+                         | otherwise = stat_to_string x ++ ", " ++ context_to_string xs
 context_to_string [] = []
 
  
