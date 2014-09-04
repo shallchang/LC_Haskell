@@ -230,11 +230,14 @@ occur _ (TVar []) = False
 recur_eval :: Term -> IO()
 recur_eval t | evalnormal t == t = putStrLn("")
              | otherwise = do
-                         let recorder = ['A'..'Z']
-                         let ((p, tp), _) = ppc term recorder
-                         putStrLn("==> "++ tostring term++ "      " ++  context_to_string p ++ " |- "++ tostring term ++ ":" ++ pretostring tp)
+                         putStrLn("==> "++ tostring term)
                          recur_eval term
                            where term = evalnormal t
+                         --let recorder = ['A'..'Z']
+                         --let ((p, tp), _) = ppc term recorder
+                         --putStrLn("==> "++ tostring term++ "      " ++  context_to_string p ++ " |- "++ tostring term ++ ":" ++ pretostring tp)
+                         --recur_eval term
+                         --  where term = evalnormal t
 
 
 recur_evalxgc :: Term -> IO()
